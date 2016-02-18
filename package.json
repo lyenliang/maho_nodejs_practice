@@ -1,10 +1,17 @@
 {
-  "name": "socket-chat-example",
+  "name": "Maho",
+  "main": "server.js",
   "version": "0.0.1",
-  "description": "my first socket.io app",
+  "description": "A Game I practiced in XPEC",
   "dependencies": {
     "express": "^4.10.2",
+    "express-session": "*",
     "mysql": "*",
-    "body-parser": "*"
+    "body-parser": "*",
+    "passport": "*",
+    "passport-local": "*",
+    "bcrypt-nodejs" : "*",
+    "morgan": "~1.0.0",
+    "connect-flash": "~0.1.1"
   }
 }
