@@ -22,18 +22,18 @@ module.exports = function(app, passport, con) {
     });
 
     app.post('/login', function(req, res) {
+        var guid = req.body.guid;
         var eventTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
         var loginTimeStamp = {
-            guid: req.body.guid,
+            guid: guid,
             eventTime: eventTime
         };
-
-        var guid = req.body.guid;
         var passwd = 'password';
         var player = {
             name: 'undefined',
             guid: guid,
-            score: 0
+            score: 0,
+            password: passwd
         }
         // check if guid has already been registered in DB
         dbManager.isNewGuid(res, con, guid,
@@ -57,6 +57,29 @@ module.exports = function(app, passport, con) {
                 res.send('score: ' + rows[0].score);
             });
         });
+    });
+
+    app.post('/logout', function(req, res) {
+        var guid = req.body.guid;
+        var eventTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        var logoutTimeStamp = {
+            guid: req.body.guid,
+            eventTime: eventTime
+        };
+        // check if guid has already been registered in DB
+        dbManager.isNewGuid(res, con, guid,
+            function(res, con, guid) {
+                console.log('Error logging out: guid ' + guid + ' does not exist');
+                res.send('Error logging out: guid ' + guid + ' does not exist');
+            }, function(res, con, guid) {
+                // old player
+                console.log('player: ' + guid + ' logging out');
+                con.query('INSERT INTO maho_log.character_logout SET ?', logoutTimeStamp, function (err, res) {
+                    if (err) throw err;
+                    console.log('Last insert ID:', res.insertId);
+                });
+                res.send('guid ' + guid + ' logout');
+            });
     });
 
     app.get('/stop', function(req, res) {
