@@ -6,10 +6,19 @@ module.exports = function(app, passport, con) {
         res.send('<h1>Hello world</h1>');
     });
 
-    app.post('/update_score', function(req, res){
+    app.post('/updateScore', function(req, res){
         var guid = req.body.guid;
         var score = req.body.score;
-
+        dbManager.isNewGuid(res, con, guid, function(res, con, guid){
+            console.log('Error updating score with guid: ' + guid);
+            res.send('Error updating score with guid: ' + guid);
+        }, function(res, con, guid){
+            con.query('UPDATE maho_game.players SET score = ? WHERE guid = ?', [score, guid], function(err, result) {
+                if(err) throw err;
+                console.log('Update score complete. guid: ' + guid);
+                res.send('Update score complete. guid: ' + guid);
+            });
+        });
     });
 
     app.post('/login', function(req, res) {

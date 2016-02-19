@@ -33,8 +33,7 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "xpec@1923",
-    database: "maho_log"
+    password: "xpec@1923"
 });
 con.connect(function(err){
     if(err){
