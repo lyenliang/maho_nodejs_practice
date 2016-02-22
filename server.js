@@ -30,17 +30,28 @@ app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
+// Error Handling
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
+
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "pppp"
+    password: "xpec@1923"
 });
 con.connect(function(err){
     if(err){
         console.log('Error connecting to Db');
         return;
     }
-    console.log('Connection established');
+    console.log('MySQL Connection established');
 });
 
 require('./app/routes.js')(app, passport, con);

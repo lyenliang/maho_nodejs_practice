@@ -4,13 +4,15 @@
   "version": "0.0.1",
   "description": "A Game I practiced in XPEC",
   "dependencies": {
-    "bcrypt-nodejs": "*",
+    "bcrypt": "*",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "*",
     "connect-flash": "~0.1.1",
     "express": "^4.10.2",
     "express-session": "*",
     "morgan": "~1.0.0",
     "mysql": "*",
+    "node-gyp": "*",
     "passport": "^0.3.2",
     "passport-local": "*"
   }
