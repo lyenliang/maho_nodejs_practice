@@ -1,4 +1,8 @@
+'use strict';
+
 var dbManager = require('./models/dbManager.js');
+var crypto = require('crypto');
+// var passEncrypt = require('./models/passEncrypt.js');
 
 module.exports = function(app, passport, con) {
 
@@ -28,7 +32,15 @@ module.exports = function(app, passport, con) {
             guid: guid,
             eventTime: eventTime
         };
-        var passwd = 'password';
+        var passwd = '';
+        if (req.body.password) {
+            passwd = req.body.password;
+        } else {
+            // Error
+            res.send('password is required');
+            return
+        }
+        passwd = crypto.createHash('sha256').update(passwd).digest('hex');
         var player = {
             name: 'undefined',
             guid: guid,
@@ -52,9 +64,15 @@ module.exports = function(app, passport, con) {
         }, function(res, con, guid) {
             // old player
             console.log('old player: ' + guid);
-            con.query('SELECT score from maho_game.players WHERE guid = ?', guid, function (err, rows) {
-                if (err) throw err;
-                res.send('score: ' + rows[0].score);
+            // check password
+            dbManager.isPasswordCorrect(con, guid, passwd, function(){
+                // password match
+                con.query('SELECT score from maho_game.players WHERE guid = ?', guid, function (err, rows) {
+                    if (err) throw err;
+                    res.send('score: ' + rows[0].score);
+                });
+            }, function(errMsg) {
+                res.send(errMsg);
             });
         });
     });
