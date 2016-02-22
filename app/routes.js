@@ -13,7 +13,7 @@ module.exports = function(app, passport, con) {
     app.post('/updateScore', function(req, res){
         var guid = req.body.guid;
         var score = req.body.score;
-        dbManager.isNewGuid(res, con, guid, function(res, con, guid){
+        dbManager.isNewGuid(con, guid, function(res, con, guid){
             console.log('Error updating score with guid: ' + guid);
             res.send('Error updating score with guid: ' + guid);
         }, function(res, con, guid){
@@ -48,8 +48,8 @@ module.exports = function(app, passport, con) {
             password: passwd
         }
         // check if guid has already been registered in DB
-        dbManager.isNewGuid(res, con, guid,
-            function(res, con, guid) {
+        dbManager.isNewGuid(con, guid,
+            function(con, guid) {
             // new player
             console.log('new guid: ' + guid);
             //  log time
@@ -61,7 +61,7 @@ module.exports = function(app, passport, con) {
                 if (err) throw err;
             });
             res.send('score: ' + player.score);
-        }, function(res, con, guid) {
+        }, function(con, guid) {
             // old player
             console.log('old player: ' + guid);
             // check password
@@ -75,29 +75,6 @@ module.exports = function(app, passport, con) {
                 res.send(errMsg);
             });
         });
-    });
-
-    app.post('/logout', function(req, res) {
-        var guid = req.body.guid;
-        var eventTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        var logoutTimeStamp = {
-            guid: req.body.guid,
-            eventTime: eventTime
-        };
-        // check if guid has already been registered in DB
-        dbManager.isNewGuid(res, con, guid,
-            function(res, con, guid) {
-                console.log('Error logging out: guid ' + guid + ' does not exist');
-                res.send('Error logging out: guid ' + guid + ' does not exist');
-            }, function(res, con, guid) {
-                // old player
-                console.log('player: ' + guid + ' logging out');
-                con.query('INSERT INTO maho_log.character_logout SET ?', logoutTimeStamp, function (err, res) {
-                    if (err) throw err;
-                    console.log('Last insert ID:', res.insertId);
-                });
-                res.send('guid ' + guid + ' logout');
-            });
     });
 
     app.get('/stop', function(req, res) {
