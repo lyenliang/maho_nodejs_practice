@@ -8,6 +8,7 @@ exports.encryptPassword = function(password, callback) {
             return callback(err);
         console.log('salt: ' + salt);
         bcrypt.hash(password, salt, function(err, hash) {
+            // hash contains salt
             console.log('hash: ' + hash);
             return callback(err, hash);
         });

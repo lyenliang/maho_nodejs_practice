@@ -12,7 +12,7 @@ module.exports = function(app, passport, con) {
     app.post('/updateScore', function(req, res){
         var guid = req.body.guid;
         var score = req.body.score;
-        dbManager.isNewGuid(con, guid, function(res, con, guid){
+        dbManager.isNewGuid(con, guid, function(con, guid){
             console.log('Error updating score with guid: ' + guid);
             res.send('Error updating score with guid: ' + guid);
         }, function(con, guid){

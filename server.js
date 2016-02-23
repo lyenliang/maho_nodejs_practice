@@ -54,6 +54,8 @@ con.connect(function(err){
     console.log('MySQL Connection established');
 });
 
+con.quer
+
 require('./app/routes.js')(app, passport, con);
 
 http.listen(port, function(){
