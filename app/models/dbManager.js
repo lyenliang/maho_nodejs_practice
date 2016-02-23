@@ -1,3 +1,7 @@
+'use strict';
+
+var encrypt = require('./passEncrypt.js');
+
 exports.isNewGuid = function(con, guid, newPlayerCallback, oldPlayerCallback) {
     con.query('SELECT guid FROM maho_game.players WHERE guid = ?', guid, function(err, rows) {
         if (err) throw err;
@@ -21,4 +25,25 @@ exports.isPasswordCorrect = function(con, guid, passwd, correctCallback, errorCa
             errorCallback('Error: duplicate guid');
         }
     });
+}
+
+exports.isPasswordCorrectSalt = function(con, guid, inputPasswd, callback) {
+    con.query('SELECT * from maho_game.players WHERE guid = ?', guid, function(err, rows) {
+        if (err) throw err;
+        if (rows.length == 1) {
+            encrypt.comparePassword(inputPasswd, rows[0].password, isPwdMatch(rows, callback));
+        } else if (rows.length == 0) {
+            callback('Error: guid does not exist');
+        } else if (rows.length > 1) {
+            callback('Error: duplicate guid');
+        }
+    });
+}
+
+var isPwdMatch = function(rows, callback) {
+    return function(err, isPasswordMatch) {
+        if(err) throw err;
+        console.log('isPasswordMatch: ' + isPasswordMatch);
+        callback(isPasswordMatch, rows);
+    }
 }
