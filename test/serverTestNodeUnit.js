@@ -20,18 +20,21 @@ function postData(path, data, callback) {
 
     // Set up the request
     var post_req = http.request(post_options, function(res) {
+        var content = '';
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
-            callback(chunk);
+            console.log('on data');
+            content += chunk;
+        });
+        res.on('end', function() {
+            console.log('Response: ' + content);
+            callback(content);
         });
     });
-
     // post the data
     post_req.write(post_data);
     post_req.end();
 }
-
 
 exports.testLoginOldPlayer = function(test) {
     var data = {
@@ -56,6 +59,7 @@ exports.testUpdateScoreError = function(test) {
     });
 }
 
+
 exports.testLoginWrongPassword = function(test) {
     var expected = 'wrong password';
     var data = {
@@ -67,29 +71,15 @@ exports.testLoginWrongPassword = function(test) {
         test.done();
     });
 }
-/*
+
 exports.testUpdateScore = function(test) {
-    var expected = 'wrong password';
+    var expected = 'Update score complete. guid: serverUnitTestUpdateScore';
     var data = {
         'guid' : 'serverUnitTestUpdateScore',
         'score' : 123
     };
-    postData('/updateScore', function(response) {
+    postData('/updateScore', data, function(response) {
         test.equal(response, expected, 'Test update score');
         test.done();
     });
 }
-*/
-
-
-/*
-exports.testLoginPasswordRequired = function(test) {
-    var data = {
-        'guid' : 'serverUnitTestPasswordRequired'
-    };
-    postData('/login', data, function(response){
-        test.equal(response, 'password is required', 'Test password required');
-        test.done();
-    });
-}
-*/
