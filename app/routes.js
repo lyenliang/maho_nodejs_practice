@@ -84,7 +84,7 @@ module.exports = function(app, passport, con) {
                     } else if(typeof result == 'boolean') {
                         console.log('isPasswordMatch: ' + result);
                         if(result == true) {
-                            res.send('score: ' + rows[0].score);
+                            res.send('score: ' + rows[0].topScore);
                         } else {
                             res.send('wrong password');
                         }

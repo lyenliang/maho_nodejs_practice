@@ -23,7 +23,6 @@ function postData(path, data, callback) {
         var content = '';
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            console.log('on data');
             content += chunk;
         });
         res.on('end', function() {
@@ -53,7 +52,7 @@ exports.testUpdateScoreError = function(test) {
         'guid' : guid,
         'score' : '123'
     };
-    postData('/updateScore', data, function(response) {
+    postData('/updateTopScore', data, function(response) {
         test.equal(response, expected, 'Test update score error');
         test.done();
     });
@@ -73,12 +72,12 @@ exports.testLoginWrongPassword = function(test) {
 }
 
 exports.testUpdateScore = function(test) {
-    var expected = 'Update score complete. guid: serverUnitTestUpdateScore';
+    var expected = 'Update topScore fail. Score 123 is smaller than top score';
     var data = {
         'guid' : 'serverUnitTestUpdateScore',
         'score' : 123
     };
-    postData('/updateScore', data, function(response) {
+    postData('/updateTopScore', data, function(response) {
         test.equal(response, expected, 'Test update score');
         test.done();
     });
