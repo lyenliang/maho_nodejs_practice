@@ -9,18 +9,25 @@ module.exports = function(app, passport, con) {
         res.send('<h1>Hello world</h1>');
     });
 
-    app.post('/updateScore', function(req, res){
+    app.post('/updateTopScore', function(req, res){
         var guid = req.body.guid;
         var score = req.body.score;
         dbManager.isNewGuid(con, guid, function(con, guid){
             console.log('Error updating score with guid: ' + guid);
             res.send('Error updating score with guid: ' + guid);
-        }, function(con, guid){
-            con.query('UPDATE maho_game.players SET score = ? WHERE guid = ?', [score, guid], function(err, result) {
-                if(err) throw err;
-                console.log('Update score complete. guid: ' + guid);
-                res.send('Update score complete. guid: ' + guid);
+        }, function(con, guid) {
+            dbManager.isScoreHigher(con, guid, score, function(isHigher){
+                if(isHigher) {
+                    con.query('UPDATE maho_game.players SET topScore = ? WHERE guid = ?', [score, guid], function(err, result) {
+                        if(err) throw err;
+                        console.log('Update score complete. guid: ' + guid);
+                        res.send('Update score complete. guid: ' + guid);
+                    });
+                } else {
+                    res.send('Update topScore fail. Score ' + score + ' is smaller than top score');
+                }
             });
+
         });
     });
 

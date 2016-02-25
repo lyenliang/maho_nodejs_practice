@@ -40,6 +40,17 @@ exports.isPasswordCorrectSalt = function(con, guid, inputPasswd, callback) {
     });
 }
 
+exports.isScoreHigher = function(con, guid, curScore, callback) {
+    con.query('SELECT topScore from maho_game.players WHERE guid = ?', [guid], function(err, rows){
+        if(err) throw err;
+        if(curScore > rows[0].topScore ) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
+}
+
 var isPwdMatch = function(rows, callback) {
     return function(err, isPasswordMatch) {
         if(err) throw err;
