@@ -14,7 +14,8 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var session = require('express-session');
 
-app.use(bodyParser.json());       // to support JSON-encoded bodies
+var jsonParser = bodyParser.json();       // to support JSON-encoded bodies
+app.use(jsonParser);
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: false
 }));
@@ -53,8 +54,6 @@ con.connect(function(err){
     }
     console.log('MySQL Connection established');
 });
-
-con.quer
 
 require('./app/routes.js')(app, passport, con);
 
