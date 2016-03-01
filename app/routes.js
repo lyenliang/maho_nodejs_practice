@@ -43,7 +43,8 @@ module.exports = function(app, passport, con) {
                                 name: 'undefined',
                                 guid: guid,
                                 topScore: 0,
-                                password: saltedPasswd
+                                password: saltedPasswd,
+                                materialNum: 0
                             }
                             con.query('INSERT INTO maho_log.character_login SET ?', loginTimeStamp, function (err, res) {
                                 if (err) throw err;
@@ -88,7 +89,10 @@ module.exports = function(app, passport, con) {
                 var score = req.body.score;
                 dbManager.isNewGuid(con, guid, function(con, guid){
                     console.log('Error updating score with guid: ' + guid);
-                    res.send('Error updating score with guid: ' + guid);
+                    res.send({
+                        msgID: msgTypes.S_UPDATE_SCORE_ERROR,
+                        msgContent: 'Error updating score with guid: ' + guid
+                    });
                 }, function(con, guid) {
                     dbManager.isScoreHigher(con, guid, score, function(isHigher){
                         if(isHigher) {
@@ -104,8 +108,8 @@ module.exports = function(app, passport, con) {
                         } else {
                             res.send({
                                 msgID: msgTypes.S_UPDATE_SCORE_ERROR,
-                                msgContent: 'Update topScore fail. Score ' + score + ' is smaller than top score'}
-                            );
+                                msgContent: 'Update topScore fail. Score ' + score + ' is smaller than top score'
+                            });
                         }
                     });
                 });

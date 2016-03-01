@@ -35,24 +35,60 @@ function postData(path, data, callback) {
     post_req.end();
 }
 
+function postData(path, data, contentType, callback) {
+    var post_data = JSON.stringify(data);
+
+    var post_options = {
+        host: 'localhost',
+        port: '3000',
+        path: path,
+        method: 'POST',
+        headers: {
+            'Cache-Control': 'no-cache',
+            'Content-Type': contentType
+        }
+    }
+
+    // Set up the request
+    var post_req = http.request(post_options, function(res) {
+        var content = '';
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            content += chunk;
+        });
+        res.on('end', function() {
+            console.log('Response: ' + JSON.stringify(content));
+            callback(content);
+        });
+    });
+    // post the data
+    post_req.write(post_data);
+    post_req.end();
+}
+
 exports.testLoginOldPlayer = function(test) {
+    var guid = "test";
+    var expected = "{\"msgID\":200000,\"msgContent\":\"score: 556\"}";
     var data = {
-        'guid' : 'serverUnitTestOldPlayer'
-    };
-    postData('/login', data, function(response){
-        test.equal(response, 'score: 0', 'Test login for old user');
+        msgID : 100000,
+        guid: guid
+    }
+    postData('/', data, "application/json;charset=UTF-8", function(response) {
+        test.equal(response, expected, "Test old user login");
         test.done();
     });
 }
 
+
 exports.testUpdateScoreError = function(test) {
     var guid = 'serverUnitTestUpdateScoreError';
-    var expected = 'Error updating score with guid: ' + guid;
+    var expected = "{\"msgID\":210003,\"msgContent\":\"Error updating score with guid: serverUnitTestUpdateScoreError\"}";
     var data = {
-        'guid' : guid,
-        'score' : '123'
+        msgID: 100002,
+        guid : guid,
+        score : 123
     };
-    postData('/updateTopScore', data, function(response) {
+    postData('/', data, "application/json;charset=UTF-8", function(response) {
         test.equal(response, expected, 'Test update score error');
         test.done();
     });
@@ -60,24 +96,28 @@ exports.testUpdateScoreError = function(test) {
 
 
 exports.testLoginWrongPassword = function(test) {
-    var expected = 'wrong password';
+    var guid = 'serverUnitTestWrongPassword';
+    var expected = "{\"msgID\":210000,\"msgContent\":\"wrong Password\"}";
     var data = {
-        'guid' : 'serverUnitTestWrongPassword',
-        'password' : 'pppa'
+        msgID: 100000,
+        guid : guid,
+        password : 'pppa'
     };
-    postData('/login', data, function(response){
+    postData('/', data, 'application/json;charset=UTF-8', function(response){
         test.equal(response, expected, 'Test wrong password');
         test.done();
     });
 }
 
 exports.testUpdateScore = function(test) {
-    var expected = 'Update topScore fail. Score 123 is smaller than top score';
+    var guid = 'serverUnitTestUpdateScore';
+    var expected = "{\"msgID\":210003,\"msgContent\":\"Update topScore fail. Score 123 is smaller than top score\"}";
     var data = {
-        'guid' : 'serverUnitTestUpdateScore',
-        'score' : 123
+        msgID: 100002,
+        guid : guid,
+        score : 123
     };
-    postData('/updateTopScore', data, function(response) {
+    postData('/', data, 'application/json;charset=UTF-8', function(response) {
         test.equal(response, expected, 'Test update score');
         test.done();
     });
