@@ -1,6 +1,28 @@
 // use nodeunit
 'use strict';
 
+var C_LOGIN_REQUEST = 100000;
+
+var S_LOGIN_OLD_PLAYER_RESPONSE = 200001;
+
+var S_LOGIN_NEW_PLAYER_RESPONSE = 200002;
+
+var S_LOGIN_ERROR = 200999;
+
+
+var C_UPDATE_SCORE_REQUEST = 10100;
+
+var S_UPDATE_SCORE_RESPONSE = 201001;
+
+var S_UPDATE_SCORE_ERROR = 201999;
+
+
+var C_UPDATE_MATERIAL_NUMBER_REQUEST = 102000;
+
+var S_UPDATE_MATERIAL_NUMBER_RESPONSE = 202001;
+
+var S_UPDATE_MATERIAL_NUMBER_ERROR = 202999;
+
 var querystring = require('querystring');
 var http = require('http');
 
@@ -68,9 +90,9 @@ function postData(path, data, contentType, callback) {
 
 exports.testLoginOldPlayer = function(test) {
     var guid = "test";
-    var expected = "{\"msgID\":200000,\"msgContent\":\"score: 556\"}";
+    var expected = "{\"msgID\":" + S_LOGIN_OLD_PLAYER_RESPONSE + ",\"msgContent\":\"score: 556\"}";
     var data = {
-        msgID : 100000,
+        msgID : C_LOGIN_REQUEST,
         guid: guid
     }
     postData('/', data, "application/json;charset=UTF-8", function(response) {
@@ -82,9 +104,9 @@ exports.testLoginOldPlayer = function(test) {
 
 exports.testUpdateScoreError = function(test) {
     var guid = 'serverUnitTestUpdateScoreError';
-    var expected = "{\"msgID\":210003,\"msgContent\":\"Error updating score with guid: serverUnitTestUpdateScoreError\"}";
+    var expected = "{\"msgID\":" + S_UPDATE_SCORE_ERROR + ",\"msgContent\":\"Error updating score with guid: serverUnitTestUpdateScoreError\"}";
     var data = {
-        msgID: 100002,
+        msgID: C_UPDATE_SCORE_REQUEST,
         guid : guid,
         score : 123
     };
@@ -97,9 +119,9 @@ exports.testUpdateScoreError = function(test) {
 
 exports.testLoginWrongPassword = function(test) {
     var guid = 'serverUnitTestWrongPassword';
-    var expected = "{\"msgID\":210000,\"msgContent\":\"wrong Password\"}";
+    var expected = "{\"msgID\":"+S_LOGIN_ERROR+",\"msgContent\":\"wrong Password\"}";
     var data = {
-        msgID: 100000,
+        msgID: C_LOGIN_REQUEST,
         guid : guid,
         password : 'pppa'
     };
@@ -111,9 +133,9 @@ exports.testLoginWrongPassword = function(test) {
 
 exports.testUpdateScore = function(test) {
     var guid = 'serverUnitTestUpdateScore';
-    var expected = "{\"msgID\":210003,\"msgContent\":\"Update topScore fail. Score 123 is smaller than top score\"}";
+    var expected = "{\"msgID\":"+S_UPDATE_SCORE_ERROR+",\"msgContent\":\"Update topScore fail. Score 123 is smaller than top score\"}";
     var data = {
-        msgID: 100002,
+        msgID: C_UPDATE_SCORE_REQUEST,
         guid : guid,
         score : 123
     };
