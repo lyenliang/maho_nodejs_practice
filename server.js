@@ -15,6 +15,8 @@ var passport = require('passport');
 var session = require('express-session');
 
 var jsonParser = bodyParser.json();       // to support JSON-encoded bodies
+
+var dbManager = require('./app/models/dbManager');
 app.use(jsonParser);
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: false
@@ -41,17 +43,19 @@ if (app.get('env') === 'development') {
         });
     });
 }
-
+dbManager.initDB();
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "xpec@1923"
 });
+
 con.connect(function(err){
     if(err){
         console.log('Error connecting to Db');
         return;
     }
+
     console.log('MySQL Connection established');
 });
 
