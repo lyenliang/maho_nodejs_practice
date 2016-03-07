@@ -2,12 +2,16 @@
 
 var url = require('url');
 
+var PropertiesReader = require('properties-reader');
+var properties = PropertiesReader('./config/server_info.properties');
+var port = properties.get('server.port');
+
 var mysql = require("mysql");
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var bodyParser = require('body-parser')
-var port = 3000;
+
 
 var morgan = require('morgan');
 var flash = require('connect-flash');
@@ -17,6 +21,9 @@ var session = require('express-session');
 var jsonParser = bodyParser.json();       // to support JSON-encoded bodies
 
 var dbManager = require('./app/models/dbManager');
+
+
+
 app.use(jsonParser);
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: false
@@ -45,9 +52,9 @@ if (app.get('env') === 'development') {
 }
 dbManager.initDB();
 var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "xpec@1923"
+    host: properties.get('database.host'),
+    user: properties.get('database.user'),
+    password: properties.get('database.password')
 });
 
 con.connect(function(err){

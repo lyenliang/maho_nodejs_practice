@@ -14,6 +14,8 @@
     "mysql": "*",
     "node-gyp": "*",
     "passport": "^0.3.2",
-    "passport-local": "*"
+    "passport-local": "*",
+    "promise": "^7.1.1",
+    "properties-reader": "~0.0.15"
   }
 }
