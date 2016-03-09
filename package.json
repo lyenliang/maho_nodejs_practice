@@ -16,6 +16,7 @@
     "passport": "^0.3.2",
     "passport-local": "*",
     "promise": "^7.1.1",
-    "properties-reader": "~0.0.15"
+    "properties-reader": "~0.0.15",
+    "loglevel": "~1.4.0"
   }
 }

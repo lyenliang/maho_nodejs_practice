@@ -1,5 +1,7 @@
 'use strict';
 
+var log = require('loglevel')
+log.setLevel('info')
 var dbManager = require('./models/dbManager.js');
 var passEncrypt = require('./models/passEncrypt.js');
 var msgTypes = require('./messageTypes.js');
@@ -10,7 +12,7 @@ module.exports = function(app, passport, con) {
     });
 
     app.post('/', function(req, res) {
-        console.log(req.body);
+        log.info(req.body);
         switch(req.body.msgID) {
             case msgTypes.C_LOGIN_REQUEST:
                 var guid = req.body.guid;
@@ -34,7 +36,7 @@ module.exports = function(app, passport, con) {
                 dbManager.isNewGuid(con, guid,
                     function(con, guid) {
                         // new player
-                        console.log('new guid: ' + guid);
+                        log.info('new guid: ' + guid);
                         //  log time
                         passEncrypt.encryptPassword(inputPasswd, function(err, hash) {
                             if(err) throw err;
@@ -48,7 +50,7 @@ module.exports = function(app, passport, con) {
                             }
                             con.query('INSERT INTO maho_log.character_login SET ?', loginTimeStamp, function (err, res) {
                                 if (err) throw err;
-                                console.log('Last insert ID:', res.insertId);
+                                log.info('Last insert ID:', res.insertId);
                             });
                             con.query('INSERT INTO maho_game.players SET ?', player, function (err, result) {
                                 if (err) throw err;
@@ -60,14 +62,14 @@ module.exports = function(app, passport, con) {
                         });
                     }, function(con, guid) {
                         // old player
-                        console.log('old player: ' + guid);
+                        log.info('old player: ' + guid);
                         // check password
                         dbManager.isPasswordCorrectSalt(con, guid, inputPasswd, function(result, rows){
                             if(typeof result == 'string') {
-                                console.log(result);
+                                log.debug(result);
                                 res.send(result);
                             } else if(typeof result == 'boolean') {
-                                console.log('isPasswordMatch: ' + result);
+                                log.debug('isPasswordMatch: ' + result);
                                 if(result == true) {
                                     res.send({
                                         msgID: msgTypes.S_LOGIN_OLD_PLAYER_RESPONSE,
@@ -88,7 +90,7 @@ module.exports = function(app, passport, con) {
                 var guid = req.body.guid;
                 var score = req.body.score;
                 dbManager.isNewGuid(con, guid, function(con, guid){
-                    console.log('Error updating score with guid: ' + guid);
+                    log.error('Error updating score with guid: ' + guid);
                     res.send({
                         msgID: msgTypes.S_UPDATE_SCORE_ERROR,
                         msgContent: 'Error updating score with guid: ' + guid
@@ -98,8 +100,7 @@ module.exports = function(app, passport, con) {
                         if(isHigher) {
                             con.query('UPDATE maho_game.players SET topScore = ? WHERE guid = ?', [score, guid], function(err, result) {
                                 if(err) throw err;
-                                console.log('Update score complete. guid: ' + guid);
-
+                                log.info('Update score complete. guid: ' + guid);
                                 res.send({
                                     msgID: msgTypes.S_UPDATE_SCORE_RESPONSE,
                                     msgContent: 'Update score complete.'}
@@ -122,7 +123,7 @@ module.exports = function(app, passport, con) {
     app.get('/stop', function(req, res) {
         var msg = 'closing mysql connections';
         con.end();
-        console.log(msg)
+        log.info(msg)
         res.send(msg);
     });
 }

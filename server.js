@@ -1,7 +1,8 @@
 'use strict';
 
 var url = require('url');
-
+var log = require('loglevel')
+log.setLevel('info')
 var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('./config/server_info.properties');
 var port = properties.get('server.port');
@@ -59,17 +60,16 @@ var con = mysql.createConnection({
 
 con.connect(function(err){
     if(err){
-        console.log('Error connecting to Db');
+        log.error('Error connecting to Db');
         return;
     }
-
-    console.log('MySQL Connection established');
+    log.info('MySQL Connection established');
 });
 
 require('./app/routes.js')(app, passport, con);
 
-http.listen(port, function(){
-  console.log('listening on port:' + port);
+http.listen(port, function() {
+    log.info('listening on port ' + port);
 });
 
 
