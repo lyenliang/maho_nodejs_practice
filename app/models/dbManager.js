@@ -1,5 +1,6 @@
 'use strict';
 
+var Promise = require('promise');
 var fs = require('fs'),
     mysql = require('mysql'),
     initConfig = {
@@ -24,6 +25,9 @@ var useLogSql = 'use maho_log';
 var gameSqlFile = __dirname + './../db/maho_game.sql';
 var logsqlFile = __dirname + './../db/maho_log.sql';
 var encrypt = require('./passEncrypt.js');
+
+// var readFile = Promise.denodeify(require('fs').readFile);
+
 
 function initLogDB() {
     initCon.query(sqlLog, function (err, results) {

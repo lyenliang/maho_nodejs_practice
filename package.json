@@ -10,6 +10,7 @@
     "connect-flash": "~0.1.1",
     "express": "^4.10.2",
     "express-session": "*",
+    "loglevel": "~1.4.0",
     "morgan": "~1.0.0",
     "mysql": "*",
     "node-gyp": "*",
@@ -17,6 +18,6 @@
     "passport-local": "*",
     "promise": "^7.1.1",
     "properties-reader": "~0.0.15",
-    "loglevel": "~1.4.0"
+    "xlsx": "^0.8.0"
   }
 }
