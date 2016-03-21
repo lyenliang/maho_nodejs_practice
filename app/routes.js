@@ -5,7 +5,8 @@ log.setLevel('info')
 var dbManager = require('./models/dbManager.js');
 var passEncrypt = require('./models/passEncrypt.js');
 var msgTypes = require('./messageTypes.js');
-var furnituresConverter = require('./../game/db/converters/FurnituresConverter.js');
+var logger = require.main.require('./game/log/logger.js');
+
 module.exports = function(app, passport, con) {
 
     app.get('/', function(req, res) {
@@ -17,11 +18,6 @@ module.exports = function(app, passport, con) {
         var guid = req.body.guid;
         switch(req.body.msgID) {
             case msgTypes.C_LOGIN_REQUEST:
-                var eventTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                var loginTimeStamp = {
-                    guid: guid,
-                    eventTime: eventTime
-                };
                 var inputPasswd = '';
                 var saltedPasswd = '';
                 if (req.body.password) {
@@ -33,6 +29,9 @@ module.exports = function(app, passport, con) {
                     // res.send('password is required');
                     // return
                 }
+                logger.logDB(con, {guid: guid}, 'character_login', function(){
+                    log.info('Last insert ID:', res.insertId);
+                });
                 // check if guid has already been registered in DB
                 dbManager.isNewGuid(con, guid,
                     function(con, guid) {
@@ -49,10 +48,6 @@ module.exports = function(app, passport, con) {
                                 password: saltedPasswd,
                                 materialNum: 0
                             }
-                            con.query('INSERT INTO maho_log.character_login SET ?', loginTimeStamp, function (err, res) {
-                                if (err) throw err;
-                                log.info('Last insert ID:', res.insertId);
-                            });
                             con.query('INSERT INTO maho_game.players SET ?', player, function (err, result) {
                                 if (err) throw err;
                             });
@@ -143,6 +138,7 @@ module.exports = function(app, passport, con) {
                 var furnituresWarehouse = JSON.stringify(req.body.furnitures);
                 con.query("UPDATE maho_game.players SET furnituresWarehouse = ? WHERE guid = ?", [furnituresWarehouse, guid], function(err, result) {
                     if(err) throw err;
+
                     res.send({
                         msgID: msgTypes.S_SET_FURNITURES_WAREHOUSE_RESPONSE,
                         msgContent: 'OK'
