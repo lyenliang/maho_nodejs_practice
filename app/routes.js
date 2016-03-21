@@ -119,6 +119,9 @@ module.exports = function(app, passport, con) {
                 var furnituresDisplayed = JSON.stringify(req.body.furnitures);
                 con.query("UPDATE maho_game.players SET furnituresDisplayed = ? WHERE guid = ?", [furnituresDisplayed, guid], function(err, result) {
                     if(err) throw err;
+                    logger.logDB(con, {furnituresAfter: furnituresDisplayed, guid: guid}, 'furnitures_displayed_set_log', function() {
+
+                    });
                     res.send({
                         msgID: msgTypes.S_SET_FURNITURES_DISPLAYED_RESPONSE,
                         msgContent: 'OK'
@@ -138,7 +141,6 @@ module.exports = function(app, passport, con) {
                 var furnituresWarehouse = JSON.stringify(req.body.furnitures);
                 con.query("UPDATE maho_game.players SET furnituresWarehouse = ? WHERE guid = ?", [furnituresWarehouse, guid], function(err, result) {
                     if(err) throw err;
-
                     res.send({
                         msgID: msgTypes.S_SET_FURNITURES_WAREHOUSE_RESPONSE,
                         msgContent: 'OK'
