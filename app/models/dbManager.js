@@ -11,8 +11,8 @@ var fs = require('fs'),
     },
     sqlGame = 'use maho_game;',
     sqlLog = 'use maho_log;',
-    sqlGameFile = __dirname + './../db/maho_game.sql',
-    sqlLogFile = __dirname + './../db/maho_log.sql',
+    sqlGameFile = __dirname + './../../game/db/init/maho_game.sql',
+    sqlLogFile = __dirname + './../../game/db/init/maho_log.sql',
     initCon;
 
 var gameDBConfig = {

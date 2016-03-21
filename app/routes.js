@@ -5,6 +5,7 @@ log.setLevel('info')
 var dbManager = require('./models/dbManager.js');
 var passEncrypt = require('./models/passEncrypt.js');
 var msgTypes = require('./messageTypes.js');
+var furnituresConverter = require('./../game/db/converters/FurnituresConverter.js');
 module.exports = function(app, passport, con) {
 
     app.get('/', function(req, res) {
@@ -13,9 +14,9 @@ module.exports = function(app, passport, con) {
 
     app.post('/', function(req, res) {
         log.info(req.body);
+        var guid = req.body.guid;
         switch(req.body.msgID) {
             case msgTypes.C_LOGIN_REQUEST:
-                var guid = req.body.guid;
                 var eventTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 var loginTimeStamp = {
                     guid: guid,
@@ -71,9 +72,14 @@ module.exports = function(app, passport, con) {
                             } else if(typeof result == 'boolean') {
                                 log.debug('isPasswordMatch: ' + result);
                                 if(result == true) {
+                                    // parse furnitures information
                                     res.send({
                                         msgID: msgTypes.S_LOGIN_OLD_PLAYER_RESPONSE,
-                                        msgContent: "score: " + rows[0].topScore}
+                                        msgContent: {
+                                            score: rows[0].topScore,
+                                            furnituresDisplayed: JSON.parse(rows[0].furnituresDisplayed)
+                                        }
+                                        }
                                     );
                                 } else {
                                     res.send({
@@ -87,7 +93,6 @@ module.exports = function(app, passport, con) {
                 );
                 break;
             case msgTypes.C_UPDATE_SCORE_REQUEST:
-                var guid = req.body.guid;
                 var score = req.body.score;
                 dbManager.isNewGuid(con, guid, function(con, guid){
                     log.error('Error updating score with guid: ' + guid);
@@ -112,6 +117,44 @@ module.exports = function(app, passport, con) {
                                 msgContent: 'Update topScore fail. Score ' + score + ' is smaller than top score'
                             });
                         }
+                    });
+                });
+                break;
+            case msgTypes.C_SET_FURNITURES_DISPLAYED_REQUEST:
+                var furnituresDisplayed = JSON.stringify(req.body.furnitures);
+                con.query("UPDATE maho_game.players SET furnituresDisplayed = ? WHERE guid = ?", [furnituresDisplayed, guid], function(err, result) {
+                    if(err) throw err;
+                    res.send({
+                        msgID: msgTypes.S_SET_FURNITURES_DISPLAYED_RESPONSE,
+                        msgContent: 'OK'
+                    });
+                });
+                break;
+            case msgTypes.C_GET_FURNITURES_DISPLAYED_REQUEST:
+                con.query('SELECT * FROM maho_game.players WHERE guid= ? ', [guid], function(err, rows) {
+                    if(err) throw err;
+                    res.send({
+                        msgID: msgTypes.S_GET_FURNITURES_DISPLAYED_RESPONSE,
+                        furnitures: rows[0].furnituresDisplayed
+                    });
+                });
+                break;
+            case msgTypes.C_SET_FURNITURES_WAREHOUSE_REQUEST:
+                var furnituresWarehouse = JSON.stringify(req.body.furnitures);
+                con.query("UPDATE maho_game.players SET furnituresWarehouse = ? WHERE guid = ?", [furnituresWarehouse, guid], function(err, result) {
+                    if(err) throw err;
+                    res.send({
+                        msgID: msgTypes.S_SET_FURNITURES_WAREHOUSE_RESPONSE,
+                        msgContent: 'OK'
+                    });
+                });
+                break;
+            case msgTypes.C_GET_FURNITURES_WAREHOUSE_REQUEST:
+                con.query('SELECT * FROM maho_game.players WHERE guid= ? ', [guid], function(err, rows) {
+                    if(err) throw err;
+                    res.send({
+                        msgID: msgTypes.S_GET_FURNITURES_WAREHOUSE_RESPONSE,
+                        furnitures: rows[0].furnituresWarehouse
                     });
                 });
                 break;

@@ -45,7 +45,7 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.send({
             message: err.message,
             error: err
         });
