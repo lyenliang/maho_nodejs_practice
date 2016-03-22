@@ -1,7 +1,9 @@
 'use strict';
 
-var log = require('loglevel')
-log.setLevel('info')
+var PropertiesReader = require('properties-reader');
+var properties = PropertiesReader('./config/server_info.properties');
+var log = require('loglevel');
+log.setLevel(properties.get('config.log_level'));
 var dbManager = require('./models/dbManager.js');
 var passEncrypt = require('./models/passEncrypt.js');
 var msgTypes = require('./messageTypes.js');
@@ -153,6 +155,15 @@ module.exports = function(app, passport, con) {
                     res.send({
                         msgID: msgTypes.S_GET_FURNITURES_WAREHOUSE_RESPONSE,
                         furnitures: rows[0].furnituresWarehouse
+                    });
+                });
+                break;
+            case msgTypes.C_GET_ITEMS_REQUEST:
+                con.query('SELECT * FROM maho_game.players WHERE guid= ? ', [guid], function(err, rows) {
+                    if(err) throw err;
+                    res.send({
+                        msgID: msgTypes.S_GET_ITEMS_RESPONSE,
+                        furnitures: rows[0].items
                     });
                 });
                 break;

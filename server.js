@@ -2,7 +2,6 @@
 
 var url = require('url');
 var log = require('loglevel')
-log.setLevel('info')
 var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('./config/server_info.properties');
 var port = properties.get('server.port');
@@ -13,6 +12,7 @@ var app = express();
 var http = require('http').Server(app);
 var bodyParser = require('body-parser')
 
+log.setLevel(properties.get('config.log_level'));
 
 var morgan = require('morgan');
 var flash = require('connect-flash');
